@@ -1,0 +1,17 @@
+Core Features:
+Image Upload & Sale – Upload, preview, categorize, and sell images
+Video Download System – Upload, stream, and sell videos
+Subscription System – Tiered plans with limited or unlimited downloads
+
+Additional Features:
+Search & Filters – By tags, categories, resolution, price
+Licensing Options – Personal, commercial, extended
+User Dashboard – Purchases, downloads, subscription status
+Ratings & Reviews – Buyers can rate content
+Payment Gateway – Stripe, PayPal, or local options
+Creator Monetization – Revenue tracking and payouts
+
+Optional/Nice-to-Have:
+Watermark Previews & DRM – Protect content from piracy
+Analytics – Popular content, top creators
+Affiliate/Referral System – Encourage referrals
