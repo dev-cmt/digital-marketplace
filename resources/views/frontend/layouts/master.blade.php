@@ -103,6 +103,11 @@
         .btn-lg { padding: 16px 36px; font-size: 16px; border-radius: var(--radius-lg); }
         .btn-sm { padding: 8px 18px; font-size: 13px; }
 
+        /* Wishlist Floating Button */
+        .wishlist-btn { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; color: #fff; z-index: 3; cursor: pointer; transition: all 0.2s; }
+        .wishlist-btn:hover { background: rgba(236,72,153,0.2); border-color: #ec4899; color: #ec4899; }
+        .wishlist-btn i { font-size: 14px; transition: all 0.2s; }
+
         /* Section heading */
         .section-label {
             display: inline-flex; align-items: center; gap: 8px;
@@ -164,20 +169,204 @@
     </style>
 
     @stack('css')
+    <style>
+        #previewLightbox {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 11, 15, 0.9); backdrop-filter: blur(20px);
+            z-index: 10000; display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        #previewLightbox.active { display: flex; opacity: 1; }
+        .lightbox-content {
+            position: relative; max-width: 90%; max-height: 90%;
+            transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        #previewLightbox.active .lightbox-content { transform: scale(1); }
+        .lightbox-close {
+            position: absolute; top: -50px; right: 0; color: #fff;
+            font-size: 30px; cursor: pointer; transition: transform 0.2s;
+        }
+        .lightbox-close:hover { transform: scale(1.1); color: var(--accent-1); }
+        .lightbox-media { border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-width: 100%; max-height: 80vh; }
+    </style>
 </head>
 
 <body>
     <!-- Navbar / Header -->
     @include('frontend.partials.navbar')
 
+    <!-- Notifications -->
+    @if(session('error') || session('success'))
+    <div style="position: fixed; top: 90px; right: 20px; z-index: 9999; min-width: 300px; animation: fadeUp 0.3s ease;">
+        @if(session('error'))
+        <div style="background: rgba(255, 107, 107, 0.95); backdrop-filter: blur(10px); color: #fff; padding: 16px 20px; border-radius: 12px; border-left: 5px solid #ff4757; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 12px;">
+            <i class="fa-solid fa-circle-exclamation" style="font-size: 20px;"></i>
+            <span style="font-weight: 600;">{{ session('error') }}</span>
+        </div>
+        @endif
+        @if(session('success'))
+        <div style="background: rgba(67, 233, 123, 0.95); backdrop-filter: blur(10px); color: #0a0b0f; padding: 16px 20px; border-radius: 12px; border-left: 5px solid #2ed573; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 12px;">
+            <i class="fa-solid fa-circle-check" style="font-size: 20px;"></i>
+            <span style="font-weight: 700;">{{ session('success') }}</span>
+        </div>
+        @endif
+    </div>
+    <script>setTimeout(() => { document.querySelector('[style*="z-index: 9999"]').style.display = 'none'; }, 5000);</script>
+    @endif
+
     <!-- Main Page Content -->
     <main>
         {{ $slot }}
     </main>
 
-    <!-- Footer -->
-    @include('frontend.partials.footer')
+    <!-- Global Preview Lightbox -->
+    <div id="previewLightbox" onclick="closePreview(event)">
+        <div class="lightbox-content" onclick="event.stopPropagation()">
+            <span class="lightbox-close" onclick="closePreview()"><i class="fa-solid fa-xmark"></i></span>
+            <div id="lightboxMediaContainer"></div>
+        </div>
+    </div>
 
+    <!-- Footer -->
     @stack('js')
+
+    <script>
+        // Global Route URLs for AJAX
+        const ROUTES = {
+            wishlistToggle: "{{ route('wishlist.toggle') }}",
+            cartAdd: "{{ route('cart.add') }}",
+            login: "{{ route('login') }}"
+        };
+
+        function toggleWishlist(event, assetId, element) {
+            if(event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const icon = element.querySelector('i');
+            const badge = document.querySelector('a[title="Wishlist"] .nav-badge');
+            
+            fetch(ROUTES.wishlistToggle, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ asset_id: assetId })
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    window.location.href = ROUTES.login;
+                    return Promise.reject('Unauthorized');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if(data.status === 'added') {
+                    icon.classList.remove('fa-regular');
+                    icon.classList.add('fa-solid');
+                    icon.style.color = '#ec4899';
+                    if (badge) badge.innerText = parseInt(badge.innerText || 0) + 1;
+                } else if(data.status === 'removed') {
+                    icon.classList.remove('fa-solid');
+                    icon.classList.add('fa-regular');
+                    icon.style.color = '';
+                    if (badge) badge.innerText = Math.max(0, parseInt(badge.innerText || 0) - 1);
+                }
+            })
+            .catch(error => console.error('Error toggling wishlist:', error));
+        }
+
+        function openPreview(url, type) {
+            const lightbox = document.getElementById('previewLightbox');
+            const container = document.getElementById('lightboxMediaContainer');
+            
+            let html = '';
+            if (type === 'video') {
+                html = `<video class="lightbox-media" controls autoplay><source src="${url}" type="video/mp4"></video>`;
+            } else if (type === 'audio') {
+                html = `<div style="text-align:center; background:rgba(255,255,255,0.05); padding:40px; border-radius:12px;"><i class="fa-solid fa-music" style="font-size:80px; color:var(--accent-1); margin-bottom:20px;"></i><br><audio controls autoplay style="width:100%"><source src="${url}" type="audio/mpeg"></audio></div>`;
+            } else {
+                html = `<img src="${url}" class="lightbox-media">`;
+            }
+
+            container.innerHTML = html;
+            lightbox.style.display = 'flex';
+            setTimeout(() => lightbox.classList.add('active'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePreview() {
+            const lightbox = document.getElementById('previewLightbox');
+            lightbox.classList.remove('active');
+            setTimeout(() => {
+                lightbox.style.display = 'none';
+                document.getElementById('lightboxMediaContainer').innerHTML = '';
+            }, 300);
+            document.body.style.overflow = '';
+        }
+
+        function shareAsset(title) {
+            const url = window.location.href;
+            if (navigator.share) {
+                navigator.share({
+                    title: title + ' - PixelVault',
+                    url: url
+                }).catch(err => console.error('Error sharing:', err));
+            } else {
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Link copied to clipboard!');
+                });
+            }
+        }
+
+        function addToCart(event, assetId, buttonElement) {
+            if(event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const originalText = buttonElement.innerHTML;
+            buttonElement.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Adding...';
+            buttonElement.disabled = true;
+
+            fetch(ROUTES.cartAdd, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ asset_id: assetId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'success' || data.status === 'exists') {
+                    const badge = document.querySelector('a[title="Cart"] .nav-badge');
+                    if (badge && data.total_items !== undefined) {
+                        badge.innerText = data.total_items;
+                    }
+                    buttonElement.innerHTML = '<i class="fa-solid fa-check"></i> Added';
+                    setTimeout(() => {
+                        buttonElement.innerHTML = originalText;
+                        buttonElement.disabled = false;
+                    }, 2000);
+                } else {
+                    alert(data.message || 'Error adding to cart');
+                    buttonElement.innerHTML = originalText;
+                    buttonElement.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error adding to cart:', error);
+                buttonElement.innerHTML = originalText;
+                buttonElement.disabled = false;
+            });
+        }
+    </script>
 </body>
 </html>

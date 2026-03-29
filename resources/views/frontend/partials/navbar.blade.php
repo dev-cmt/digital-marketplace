@@ -147,54 +147,69 @@
             Pixel<span>Vault</span>
         </a>
 
-        <!-- Search -->
-        <div class="nav-search">
+        <form action="{{ route('frontend.assets.index') }}" method="GET" class="nav-search">
+            @if(request('type')) <input type="hidden" name="type" value="{{ request('type') }}"> @endif
+            @if(request('category')) <input type="hidden" name="category" value="{{ request('category') }}"> @elseif(request()->route('category_slug')) <input type="hidden" name="category" value="{{ request()->route('category_slug') }}"> @endif
+            @if(request('sort')) <input type="hidden" name="sort" value="{{ request('sort') }}"> @endif
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" placeholder="Search photos, videos, vectors…" id="navSearchInput">
-            <button class="nav-search-btn">Search</button>
-        </div>
+            <input type="text" name="search" placeholder="Search photos, videos, vectors…" id="navSearchInput" value="{{ request('search') }}">
+            <button type="submit" class="nav-search-btn">Search</button>
+        </form>
 
         <!-- Nav Links -->
         <div class="nav-links">
             <div class="nav-dropdown">
                 <a href="#">Browse <i class="fa-solid fa-chevron-down" style="font-size:10px;margin-left:3px;"></i></a>
                 <div class="nav-dropdown-menu">
-                    <a href="#"><i class="fa-regular fa-image"></i> Photos</a>
-                    <a href="#"><i class="fa-solid fa-video"></i> Videos</a>
-                    <a href="#"><i class="fa-solid fa-waveform-lines"></i> Audio</a>
-                    <a href="#"><i class="fa-solid fa-pen-nib"></i> Vectors</a>
-                    <a href="#"><i class="fa-solid fa-boxes-stacked"></i> 3D Assets</a>
+                    @foreach($globalCategories as $category)
+                    <a href="{{ route('frontend.assets.category', $category->slug) }}"><i class="{{ $category->icon }}"></i> {{ $category->name }}</a>
+                    @endforeach
                 </div>
             </div>
-            <a href="#">Pricing</a>
-            <a href="#">Creators</a>
-            <a href="#">Enterprise</a>
+            <a href="{{ route('pricing') }}" class="{{ request()->routeIs('pricing') ? 'active' : '' }}">Pricing</a>
+            <a href="{{ route('frontend.creators') }}" class="{{ request()->routeIs('frontend.creators') ? 'active' : '' }}">Creators</a>
+            <a href="{{ route('enterprise') }}" class="{{ request()->routeIs('enterprise') ? 'active' : '' }}">Enterprise</a>
         </div>
 
         <!-- Actions -->
         <div class="nav-actions">
+            <a href="{{ route('cart.index') }}" class="nav-icon-btn" title="Cart">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="nav-badge">{{ $cartBadgeCount ?? 0 }}</span>
+            </a>
             @auth
-                <a href="#" class="nav-icon-btn" title="Cart">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                    <span class="nav-badge">3</span>
+                <a href="{{ route('wishlist.index') }}" class="nav-icon-btn" title="Wishlist">
+                    <i class="fa-solid fa-heart" style="{{ Route::is('wishlist.index') ? 'color: #ec4899;' : '' }}"></i>
+                    <span class="nav-badge">{{ auth()->check() ? auth()->user()->wishlists()->count() : 0 }}</span>
                 </a>
-                <a href="#" class="nav-icon-btn" title="Notifications">
-                    <i class="fa-regular fa-bell"></i>
-                    <span class="nav-badge">5</span>
-                </a>
-                <button class="btn-upload">
+                <a href="{{ route('assets.create') }}" class="btn-upload" style="text-decoration:none;">
                     <i class="fa-solid fa-cloud-arrow-up"></i>
                     <span>Upload</span>
-                </button>
-                <div class="nav-avatar">
-                    <img src="https://ui-avatars.com/api/?name={{ auth()->user()->name }}&background=6c63ff&color=fff" alt="avatar">
+                </a>
+                <div class="nav-dropdown">
+                    <div class="nav-avatar">
+                        <img src="https://ui-avatars.com/api/?name={{ auth()->user()->name }}&background=6c63ff&color=fff" alt="avatar">
+                    </div>
+                    <div class="nav-dropdown-menu" style="left: auto; right: 0; min-width: 160px; top: 100%;">
+                        <div style="padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 8px;">
+                            <span style="display:block; font-size:13px; font-weight:700; color:#fff;">{{ auth()->user()->name }}</span>
+                            <span style="display:block; font-size:11px; color:rgba(255,255,255,0.5);">{{ auth()->user()->email }}</span>
+                        </div>
+                        <a href="{{ route('frontend.profile') }}"><i class="fa-solid fa-user"></i> Profile</a>
+                        <a href="#" class="text-danger" onclick="event.preventDefault(); document.getElementById('logout-form-desktop').submit();">
+                            <i class="fa-solid fa-right-from-bracket text-danger"></i> Log out
+                        </a>
+                    </div>
                 </div>
+                <form id="logout-form-desktop" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
             @else
                 <a href="{{ route('login') }}" class="btn-login">Log In</a>
-                <button class="btn-upload">
+                <a href="{{ route('register') }}" class="btn-upload" style="text-decoration:none;">
                     <i class="fa-solid fa-cloud-arrow-up"></i>
                     <span>Start Selling</span>
-                </button>
+                </a>
             @endauth
             <button class="nav-mobile-toggle" id="mobileToggle">
                 <i class="fa-solid fa-bars"></i>
@@ -202,23 +217,91 @@
         </div>
     </div>
 
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu">
-        <a href="#">Photos</a>
-        <a href="#">Videos</a>
-        <a href="#">Audio</a>
-        <a href="#">Vectors</a>
-        <a href="#">Pricing</a>
-        <a href="#">Creators</a>
-        @auth
-            <a href="{{ route('dashboard') }}">Dashboard</a>
-        @else
-            <a href="{{ route('login') }}">Log In</a>
-        @endauth
+    <!-- Mobile Drawer Overlay -->
+    <div class="mobile-drawer-overlay" id="mobileOverlay" onclick="toggleMobileNav()"></div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-nav-drawer" id="mobileNav">
+        <div class="drawer-header">
+            <h5 class="fw-bold mb-0">Menu</h5>
+            <button class="drawer-close" onclick="toggleMobileNav()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="drawer-body">
+            <div class="drawer-section">
+                <span class="drawer-label">Collections</span>
+                @foreach($globalCategories as $category)
+                <a href="{{ route('frontend.assets.category', $category->slug) }}" class="drawer-link">
+                    <i class="{{ $category->icon }}"></i> {{ $category->name }}
+                </a>
+                @endforeach
+            </div>
+
+            <div class="drawer-section">
+                <span class="drawer-label">Explore</span>
+                <a href="{{ route('pricing') }}" class="drawer-link"><i class="fa-solid fa-tags"></i> Pricing</a>
+                <a href="{{ route('frontend.creators') }}" class="drawer-link"><i class="fa-solid fa-users"></i> Creators</a>
+                <a href="{{ route('enterprise') }}" class="drawer-link"><i class="fa-solid fa-building"></i> Enterprise</a>
+            </div>
+
+            <div class="drawer-section">
+                <span class="drawer-label">Account</span>
+                <a href="{{ route('cart.index') }}" class="drawer-link"><i class="fa-solid fa-cart-shopping"></i> My Cart</a>
+                @auth
+                    <a href="{{ route('wishlist.index') }}" class="drawer-link"><i class="fa-solid fa-heart"></i> My Wishlist</a>
+                    <a href="{{ route('frontend.profile') }}" class="drawer-link"><i class="fa-solid fa-user"></i> Profile</a>
+                    @can('view dashboard')
+                    <a href="{{ route('dashboard') }}" class="drawer-link"><i class="fa-solid fa-gauge"></i> Admin Dashboard</a>
+                    @endcan
+                    <a href="#" class="drawer-link text-danger mt-3" onclick="event.preventDefault(); document.getElementById('logout-form-desktop').submit();">
+                        <i class="fa-solid fa-right-from-bracket"></i> Log Out
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-primary w-100 justify-content-center mb-2">Log In</a>
+                    <a href="{{ route('register') }}" class="btn btn-outline w-100 justify-content-center">Sign Up</a>
+                @endauth
+            </div>
+        </div>
     </div>
 </nav>
 
+<style>
+/* ============================
+   MOBILE DRAWER STYLES
+   ============================ */
+.mobile-nav-drawer {
+    position: fixed; top: 0; right: -320px; width: 300px; height: 100vh;
+    background: #0f1116; backdrop-filter: blur(25px); z-index: 10001;
+    border-left: 1px solid rgba(255,255,255,0.08); padding: 40px 25px;
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto;
+}
+.mobile-nav-drawer.active { right: 0; }
+
+.mobile-drawer-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    z-index: 10000; opacity: 0; visibility: hidden; transition: all 0.4s;
+}
+.mobile-drawer-overlay.active { opacity: 1; visibility: visible; }
+
+.drawer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.drawer-close { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; }
+
+.drawer-section { margin-bottom: 30px; }
+.drawer-label { font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1.5px; display: block; margin-bottom: 12px; }
+.drawer-link { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; color: rgba(255,255,255,0.7); font-size: 14px; text-decoration: none; transition: 0.2s; }
+.drawer-link:hover { background: rgba(108, 99, 255, 0.1); color: var(--accent-1); }
+.drawer-link i { width: 18px; color: var(--accent-1); }
+</style>
+
 <script>
+function toggleMobileNav() {
+    const drawer = document.getElementById('mobileNav');
+    const overlay = document.getElementById('mobileOverlay');
+    drawer.classList.toggle('active');
+    overlay.classList.toggle('active');
+    document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : '';
+}
+
 (function(){
     // Navbar scroll effect
     const navbar = document.getElementById('navbar');
@@ -226,15 +309,10 @@
         navbar.classList.toggle('scrolled', window.scrollY > 20);
     }, { passive: true });
 
-    // Mobile toggle
+    // Mobile toggle binding
     const toggle = document.getElementById('mobileToggle');
-    const menu = document.getElementById('mobileMenu');
-    if(toggle && menu) {
-        toggle.addEventListener('click', function(){
-            menu.classList.toggle('open');
-            toggle.querySelector('i').className = menu.classList.contains('open')
-                ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
-        });
+    if(toggle) {
+        toggle.addEventListener('click', toggleMobileNav);
     }
 })();
 </script>

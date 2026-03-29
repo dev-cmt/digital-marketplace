@@ -23,6 +23,7 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'phone',
         'password',
+        'user_type',
         'photo_path',
         'api_token',
         'status',
@@ -61,5 +62,15 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    public function assets()
+    {
+        return $this->hasMany(Asset::class);
     }
 }

@@ -34,8 +34,15 @@
                         <span class="side-menu__label">Dashboard</span>
                     </a>
                 </li>
-
-
+                
+                <!-- Orders Management -->
+                <li class="slide">
+                    <a href="{{ route('orders.index') }}"
+                        class="side-menu__item {{ Request::is('orders*') ? 'active' : '' }}">
+                        <i class="bx bx-cart side-menu__icon"></i>
+                        <span class="side-menu__label">Orders</span>
+                    </a>
+                </li>
                 <!-- Developer API -->
                 @can('view developer api')
                 <li class="slide">
@@ -79,6 +86,39 @@
                         <li class="slide">
                             <a href="{{ route('users.index') }}" class="side-menu__item {{ Request::is('users*') ? 'active' : '' }}">
                                 Users Manage
+                            </a>
+                        </li>
+                        @endcan
+                    </ul>
+                </li>
+                @endcanany
+
+
+                <!-- Marketplace Management -->
+                @canany(['view categories', 'view assets'])
+                <li class="slide has-sub {{ Request::is('categories*') || Request::is('assets*') ? 'active open' : '' }}">
+                    <a href="javascript:void(0);" class="side-menu__item {{ Request::is('categories*') || Request::is('assets*') ? 'active' : '' }}">
+                        <i class="bx bx-store side-menu__icon"></i>
+                        <span class="side-menu__label">Marketplace</span>
+                        <i class="fe fe-chevron-right side-menu__angle"></i>
+                    </a>
+                    <ul class="slide-menu child1">
+                        @can('view categories')
+                        <li class="slide">
+                            <a href="{{ route('categories.index') }}" class="side-menu__item {{ Request::is('categories*') ? 'active' : '' }}">
+                                Categories
+                            </a>
+                        </li>
+                        @endcan
+                        @can('view assets')
+                        <li class="slide">
+                            <a href="{{ route('assets.index') }}" class="side-menu__item {{ Request::is('assets*') ? 'active' : '' }}">
+                                Assets Manage
+                            </a>
+                        </li>
+                        <li class="slide">
+                            <a href="{{ route('creators.index') }}" class="side-menu__item {{ Request::is('creators*') ? 'active' : '' }}">
+                                Creators List
                             </a>
                         </li>
                         @endcan

@@ -50,6 +50,7 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Role</th>
+                                    <th>Type</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -69,12 +70,18 @@
                                         <td>{{ $user->email }}</td>
                                         <td>{{ $user->roles->pluck('name')->first() ?? '-' }}</td>
                                         <td>
+                                            <span class="badge bg-{{ $user->user_type == 'admin' ? 'danger' : ($user->user_type == 'creator' ? 'primary' : 'info') }}-transparent">
+                                                {{ ucfirst($user->user_type) }}
+                                            </span>
+                                        </td>
+                                        <td>
                                             <div class="btn-list">
                                                 <button type="button"
                                                     class="btn btn-sm btn-warning-light btn-icon edit-user"
                                                     data-id="{{ $user->id }}" data-name="{{ $user->name }}"
                                                     data-email="{{ $user->email }}"
                                                     data-role="{{ $user->roles->pluck('name')->first() ?? '' }}"
+                                                    data-type="{{ $user->user_type }}"
                                                     data-photo="{{ $user->photo_path }}" data-bs-toggle="modal"
                                                     data-bs-target="#editUserModal">
                                                     <i class="ri-pencil-line"></i>
@@ -143,6 +150,14 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
+                                <label class="form-label">User Type</label>
+                                <select name="user_type" class="form-select" required>
+                                    <option value="customer" selected>Customer</option>
+                                    <option value="creator">Creator</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
                                 <label class="form-label">Photo</label>
                                 <input type="file" name="photo" class="form-control">
                             </div>
@@ -185,6 +200,14 @@
                                     @foreach ($roles as $role)
                                         <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
                                     @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">User Type</label>
+                                <select name="user_type" class="form-select" id="edit_type">
+                                    <option value="customer">Customer</option>
+                                    <option value="creator">Creator</option>
+                                    <option value="admin">Admin</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
@@ -232,12 +255,14 @@
                     const name = $(this).data('name');
                     const email = $(this).data('email');
                     const role = $(this).data('role');
+                    const type = $(this).data('type');
                     const photo = $(this).data('photo');
 
                     $('#edit_id').val(id);
                     $('#edit_name').val(name);
                     $('#edit_email').val(email);
                     $('#edit_role').val(role).trigger('change');
+                    $('#edit_type').val(type);
 
                     if (photo) {
                         $('#current_photo_preview').html(

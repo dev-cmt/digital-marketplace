@@ -30,6 +30,8 @@ class AdminController extends Controller
             'settings',
             'users',
             'roles',
+            'categories',
+            'assets',
         ];
 
         $singlePermissions = [

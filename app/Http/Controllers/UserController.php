@@ -26,16 +26,18 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'role' => 'required|exists:roles,name',
+            'user_type' => 'nullable|string|in:admin,creator,customer',
             'photo' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:2048',
         ]);
 
         $user = new User();
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->user_type = $request->user_type ?? 'customer';
         $user->password = Hash::make($request->password);
 
         if ($request->hasFile('photo')) {
-            $user->photo_path = ImageHelper::uploadImage($request->file('photo'), 'uploads/profile');
+            $user->photo_path = ImageHelper::uploadImage($request->file('photo'), 'uploads/users');
         }
         $user->save();
         $user->assignRole($request->role);
@@ -50,18 +52,19 @@ class UserController extends Controller
             'id' => 'required|exists:users,id',
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $request->id,
-            'role' => 'required|exists:roles,name',
+            // 'role' => 'required|exists:roles,name',
+            'user_type' => 'nullable|string|in:admin,creator,customer',
             'photo' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:2048',
         ]);
 
         $user = User::findOrFail($request->id);
-
         if ($request->hasFile('photo')) {
-            $user->photo_path = ImageHelper::uploadImage($request->file('photo'), 'uploads/profile', $user->photo_path);
+            $user->photo_path = ImageHelper::uploadImage($request->file('photo'), 'uploads/users', $user->photo_path);
         }
 
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->user_type = $request->user_type;
         $user->save();
 
         $user->syncRoles([$request->role]);

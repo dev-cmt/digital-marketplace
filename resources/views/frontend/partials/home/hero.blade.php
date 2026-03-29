@@ -151,25 +151,24 @@
 
                 <!-- Search Bar -->
                 <div class="hero-search-wrap">
-                    <div class="hero-search-bar">
-                        <select class="hero-search-select">
-                            <option>All</option>
-                            <option>Photos</option>
-                            <option>Videos</option>
-                            <option>Audio</option>
-                            <option>Vectors</option>
+                    <form action="{{ route('frontend.assets.index') }}" method="GET" class="hero-search-bar">
+                        <select name="category" class="hero-search-select">
+                            <option value="">All</option>
+                            @foreach($categories as $category)
+                            <option value="{{ $category->slug }}">{{ $category->name }}</option>
+                            @endforeach
                         </select>
-                        <input class="hero-search-input" type="text" placeholder="Search millions of assets…">
-                        <button class="hero-search-submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
-                    </div>
+                        <input name="search" class="hero-search-input" type="text" placeholder="Search millions of assets…" value="{{ request('search') }}">
+                        <button type="submit" class="hero-search-submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+                    </form>
                     <div class="hero-trending-tags">
                         <span>Trending:</span>
-                        <span class="hero-tag-pill">Nature</span>
-                        <span class="hero-tag-pill">Business</span>
-                        <span class="hero-tag-pill">Technology</span>
-                        <span class="hero-tag-pill">Aesthetic</span>
-                        <span class="hero-tag-pill">4K Video</span>
-                        <span class="hero-tag-pill">Abstract</span>
+                        <a href="{{ route('frontend.assets.index', ['search'=>'Nature']) }}" class="hero-tag-pill">Nature</a>
+                        <a href="{{ route('frontend.assets.index', ['search'=>'Business']) }}" class="hero-tag-pill">Business</a>
+                        <a href="{{ route('frontend.assets.index', ['search'=>'Technology']) }}" class="hero-tag-pill">Technology</a>
+                        <a href="{{ route('frontend.assets.index', ['search'=>'Aesthetic']) }}" class="hero-tag-pill">Aesthetic</a>
+                        <a href="{{ route('frontend.assets.index', ['search'=>'4K Video']) }}" class="hero-tag-pill">4K Video</a>
+                        <a href="{{ route('frontend.assets.index', ['search'=>'Abstract']) }}" class="hero-tag-pill">Abstract</a>
                     </div>
                 </div>
 
@@ -197,27 +196,19 @@
 
             <!-- Visual Mosaic -->
             <div class="hero-visual" aria-hidden="true">
-                <div class="hero-card">
-                    <img class="hero-card-img" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80" alt="Nature photo">
-                    <span class="hero-tag tag-photo">Photo</span>
-                    <div class="hero-card-badge"><i class="fa-solid fa-heart" style="color:#ec4899;"></i> 2.4k</div>
-                </div>
-                <div class="hero-card">
-                    <img class="hero-card-img" src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&q=80" alt="Forest video">
-                    <span class="hero-tag tag-video">Video</span>
-                    <div class="hero-card-play"><div class="hero-card-play-btn"><i class="fa-solid fa-play"></i></div></div>
-                    <div class="hero-card-badge"><i class="fa-solid fa-eye"></i> 12k</div>
-                </div>
-                <div class="hero-card">
-                    <img class="hero-card-img" src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=400&q=80" alt="Landscape">
-                    <span class="hero-tag tag-vector">Vector</span>
-                    <div class="hero-card-badge"><i class="fa-solid fa-download"></i> 856</div>
-                </div>
-                <div class="hero-card">
-                    <img class="hero-card-img" src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&q=80" alt="Business">
-                    <span class="hero-tag tag-audio">Audio</span>
-                    <div class="hero-card-badge"><i class="fa-solid fa-star" style="color:#f59e0b;"></i> 4.9</div>
-                </div>
+                @foreach($featuredAssets->take(4) as $asset)
+                <a href="{{ route('frontend.assets.show', $asset->slug) }}" class="hero-card">
+                    <img class="hero-card-img" src="{{ $asset->thumbnail }}" alt="{{ $asset->title }}">
+                    <span class="hero-tag tag-{{ $asset->type }}">{{ ucfirst($asset->type) }}</span>
+                    <button class="wishlist-btn" style="top:10px; left:10px; right:auto;" onclick="toggleWishlist(event, {{ $asset->id }}, this)" title="Toggle Wishlist">
+                        <i class="{{ in_array($asset->id, $userWishlistIds ?? []) ? 'fa-solid' : 'fa-regular' }} fa-heart" style="{{ in_array($asset->id, $userWishlistIds ?? []) ? 'color: #ec4899;' : '' }}"></i>
+                    </button>
+                    @if($asset->type === 'video')
+                    <div class="media-card-play"><div class="hero-card-play-btn"><i class="fa-solid fa-play"></i></div></div>
+                    @endif
+                    <div class="hero-card-badge"><i class="fa-solid fa-heart" style="color:#ec4899;"></i> {{ number_format($asset->likes_count / 1000, 1) }}k</div>
+                </a>
+                @endforeach
             </div>
         </div>
     </div>

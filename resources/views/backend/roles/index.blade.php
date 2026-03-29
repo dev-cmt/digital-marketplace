@@ -7,7 +7,7 @@
                 }
         </style>
         <!-- Sweetalerts CSS -->
-        <link rel="stylesheet" href="{{ asset('backEnd/assets/libs/sweetalert2/sweetalert2.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('assets/libs/sweetalert2/sweetalert2.min.css') }}">
     @endpush
 
     <div class="mt-4"></div>
@@ -87,7 +87,7 @@
 
     @push('js')
         <!-- Sweetalerts JS -->
-        <script src="{{ asset('backEnd/assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
     @endpush
 
 </x-backend-layout>

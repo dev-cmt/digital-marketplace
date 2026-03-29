@@ -39,31 +39,27 @@
                 <h2 class="section-title">Meet Our Best Sellers</h2>
                 <p class="section-subtitle">Artists, photographers, and videographers earning with PixelVault.</p>
             </div>
-            <a href="#" style="padding:10px 20px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#9397a8;font-size:13px;font-weight:600;transition:all 0.2s;display:inline-flex;align-items:center;gap:7px;">
+            <a href="{{ route('frontend.creators') }}" style="padding:10px 20px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#9397a8;font-size:13px;font-weight:600;transition:all 0.2s;display:inline-flex;align-items:center;gap:7px;">
                 View All Creators <i class="fa-solid fa-arrow-right"></i>
             </a>
         </div>
         <div class="creators-grid">
-            @php
-            $creators = [
-                ['img'=>'https://randomuser.me/api/portraits/women/50.jpg','name'=>'Sofia Laurent','handle'=>'@sofialaurent','assets'=>'1.2k','sales'=>'18.4k','earn'=>'$42k'],
-                ['img'=>'https://randomuser.me/api/portraits/men/54.jpg','name'=>'Marcus Chen','handle'=>'@marcusvisuals','assets'=>'854','sales'=>'14.1k','earn'=>'$31k'],
-                ['img'=>'https://randomuser.me/api/portraits/women/62.jpg','name'=>'Aria Nakamura','handle'=>'@ariastudio','assets'=>'630','sales'=>'11.7k','earn'=>'$27k'],
-                ['img'=>'https://randomuser.me/api/portraits/men/77.jpg','name'=>'Remy Dubois','handle'=>'@remydubois','assets'=>'480','sales'=>'9.2k','earn'=>'$19k'],
-            ];
-            @endphp
-            @foreach($creators as $c)
+            @foreach($topCreators as $c)
             <div class="creator-card reveal">
-                <div class="creator-earnings">{{ $c['earn'] }} earned</div>
+                <div class="creator-earnings">${{ number_format(($c->assets_sum_downloads_count ?? 0) * 8.5) }} earned</div>
                 <div class="creator-avatar-wrap">
-                    <img class="creator-avatar" src="{{ $c['img'] }}" alt="{{ $c['name'] }}">
+                    @if($c->photo_path)
+                        <img class="creator-avatar" src="{{ asset($c->photo_path) }}" alt="{{ $c->name }}">
+                    @else
+                        <img class="creator-avatar" src="https://ui-avatars.com/api/?name={{ urlencode($c->name) }}&background=6c63ff&color=fff" alt="{{ $c->name }}">
+                    @endif
                     <div class="creator-verified"><i class="fa-solid fa-check"></i></div>
                 </div>
-                <div class="creator-name">{{ $c['name'] }}</div>
-                <div class="creator-handle">{{ $c['handle'] }}</div>
+                <div class="creator-name">{{ $c->name }}</div>
+                <div class="creator-handle">{{ '@' . strtolower(str_replace(' ', '', $c->name)) }}</div>
                 <div class="creator-stats">
-                    <div class="creator-stat"><div class="creator-stat-num">{{ $c['assets'] }}</div><div class="creator-stat-label">Assets</div></div>
-                    <div class="creator-stat"><div class="creator-stat-num">{{ $c['sales'] }}</div><div class="creator-stat-label">Sales</div></div>
+                    <div class="creator-stat"><div class="creator-stat-num">{{ number_format($c->assets_count) }}</div><div class="creator-stat-label">Assets</div></div>
+                    <div class="creator-stat"><div class="creator-stat-num">{{ number_format($c->assets_sum_downloads_count ?? 0) }}</div><div class="creator-stat-label">Sales</div></div>
                 </div>
                 <button class="creator-btn">View Portfolio</button>
             </div>

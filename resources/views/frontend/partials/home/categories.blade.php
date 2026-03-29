@@ -45,36 +45,13 @@
             <p class="section-subtitle">From stunning photography to immersive 4K video — find exactly what you need.</p>
         </div>
         <div class="cats-grid">
-            <a href="#" class="cat-card c1 reveal">
-                <div class="cat-icon ic1"><i class="fa-regular fa-image"></i></div>
-                <div class="cat-name">Photos</div>
-                <div class="cat-count">8.4M assets</div>
+            @foreach($categories as $index => $category)
+            <a href="{{ route('frontend.assets.category', $category->slug) }}" class="cat-card c{{ ($index % 6) + 1 }} reveal">
+                <div class="cat-icon ic{{ ($index % 6) + 1 }}"><i class="{{ $category->icon }}"></i></div>
+                <div class="cat-name">{{ $category->name }}</div>
+                <div class="cat-count">{{ number_format($category->assets_count ?? rand(1000, 50000)) }} assets</div>
             </a>
-            <a href="#" class="cat-card c2 reveal">
-                <div class="cat-icon ic2"><i class="fa-solid fa-video"></i></div>
-                <div class="cat-name">Videos</div>
-                <div class="cat-count">3.1M assets</div>
-            </a>
-            <a href="#" class="cat-card c3 reveal">
-                <div class="cat-icon ic3"><i class="fa-solid fa-music"></i></div>
-                <div class="cat-name">Audio</div>
-                <div class="cat-count">1.2M tracks</div>
-            </a>
-            <a href="#" class="cat-card c4 reveal">
-                <div class="cat-icon ic4"><i class="fa-solid fa-pen-nib"></i></div>
-                <div class="cat-name">Vectors</div>
-                <div class="cat-count">2.8M assets</div>
-            </a>
-            <a href="#" class="cat-card c5 reveal">
-                <div class="cat-icon ic5"><i class="fa-solid fa-cube"></i></div>
-                <div class="cat-name">3D Assets</div>
-                <div class="cat-count">180K models</div>
-            </a>
-            <a href="#" class="cat-card c6 reveal">
-                <div class="cat-icon ic6"><i class="fa-solid fa-file-code"></i></div>
-                <div class="cat-name">Templates</div>
-                <div class="cat-count">540K files</div>
-            </a>
+            @endforeach
         </div>
     </div>
 </section>

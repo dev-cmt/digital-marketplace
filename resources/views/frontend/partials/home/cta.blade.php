@@ -49,7 +49,7 @@
                 <a href="{{ route('login') }}" class="cta-btn-primary">
                     <i class="fa-solid fa-rocket"></i> Get Started Free
                 </a>
-                <a href="#pricing" class="cta-btn-outline">
+                <a href="{{ route('pricing') }}" class="cta-btn-outline">
                     <i class="fa-solid fa-tag"></i> View Plans
                 </a>
             </div>

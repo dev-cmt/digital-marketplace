@@ -71,29 +71,21 @@
                 <p class="section-subtitle">Curated by our editors – fresh uploads daily.</p>
             </div>
             <div class="trending-tabs">
-                <button class="trending-tab active">All</button>
-                <button class="trending-tab">Photos</button>
-                <button class="trending-tab">Videos</button>
-                <button class="trending-tab">Audio</button>
-                <button class="trending-tab">Free</button>
+                <button class="trending-tab active" data-type="all">All</button>
+                @foreach($globalCategories->take(4) as $cat)
+                <button class="trending-tab" data-type="{{ strtolower($cat->name) }}">{{ $cat->name }}</button>
+                @endforeach
+                <button class="trending-tab" data-type="free">Free</button>
             </div>
         </div>
         <div class="media-grid">
-            @php
-            $items = [
-                ['img'=>'https://images.unsplash.com/photo-1682685797208-c741d58c2eff?w=400&q=80','type'=>'photo','t'=>'type-photo','title'=>'Golden Hour Landscape','author'=>'James Carter','avatar'=>'https://randomuser.me/api/portraits/men/11.jpg','price'=>'$12','w'=>true,'likes'=>'3.2k','downloads'=>'824'],
-                ['img'=>'https://images.unsplash.com/photo-1719937206300-fc0dac6f8cac?w=400&q=80','type'=>'video','t'=>'type-video','title'=>'Ocean Timelapse 4K','author'=>'Sofia Renaud','avatar'=>'https://randomuser.me/api/portraits/women/22.jpg','price'=>'$29','w'=>true,'likes'=>'5.8k','downloads'=>'1.2k'],
-                ['img'=>'https://images.unsplash.com/photo-1700862716977-5cdb7c4a7a28?w=400&q=80','type'=>'vector','t'=>'type-vector','title'=>'Minimal Brand Kit','author'=>'Leos Studio','avatar'=>'https://randomuser.me/api/portraits/men/33.jpg','price'=>'$18','w'=>false,'likes'=>'2.1k','downloads'=>'630'],
-                ['img'=>'https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=400&q=80','type'=>'photo','t'=>'type-photo','title'=>'Urban Architecture','author'=>'Chen Wei','avatar'=>'https://randomuser.me/api/portraits/women/44.jpg','price'=>'Free','w'=>false,'likes'=>'1.4k','downloads'=>'980'],
-            ];
-            @endphp
-            @foreach($items as $item)
-            <div class="media-card reveal">
+            @foreach($trendingAssets as $item)
+            <a href="{{ route('frontend.assets.show', $item->slug) }}" class="media-card reveal">
                 <div class="media-thumb">
-                    <img src="{{ $item['img'] }}" alt="{{ $item['title'] }}" loading="lazy">
+                    <img src="{{ $item->thumbnail }}" alt="{{ $item->title }}" loading="lazy">
                     <div class="media-overlay"></div>
-                    <span class="media-type-badge {{ $item['t'] }}">{{ $item['type'] }}</span>
-                    @if($item['w'])
+                    <span class="media-type-badge type-{{ $item->type }}">{{ $item->type }}</span>
+                    @if($item->price === null)
                     <div class="media-watermark"><span>PixelVault</span></div>
                     @endif
                     <div class="media-actions">
@@ -105,23 +97,25 @@
                 <div class="media-info">
                     <div class="media-info-top">
                         <div class="media-author">
-                            <img class="media-author-avatar" src="{{ $item['avatar'] }}" alt="{{ $item['author'] }}">
-                            <span class="media-author-name">{{ $item['author'] }}</span>
+                            <img class="media-author-avatar" src="https://randomuser.me/api/portraits/men/{{ rand(1, 99) }}.jpg" alt="Author">
+                            <span class="media-author-name">Creator</span>
                         </div>
-                        <span class="media-price {{ $item['price']==='Free' ? 'free' : '' }}">{{ $item['price'] }}</span>
+                        <span class="media-price {{ $item->is_free ? 'free' : '' }}">
+                            {{ $item->is_free ? 'Free' : '$' . number_format($item->price, 2) }}
+                        </span>
                     </div>
-                    <div class="media-title">{{ $item['title'] }}</div>
+                    <div class="media-title">{{ $item->title }}</div>
                     <div class="media-meta">
-                        <span><i class="fa-regular fa-heart"></i>{{ $item['likes'] }}</span>
-                        <span><i class="fa-solid fa-download"></i>{{ $item['downloads'] }}</span>
+                        <span><i class="fa-regular fa-heart"></i>{{ number_format($item->likes_count) }}</span>
+                        <span><i class="fa-solid fa-download"></i>{{ number_format($item->downloads_count) }}</span>
                         <span><i class="fa-solid fa-star" style="color:#f59e0b;"></i>4.9</span>
                     </div>
                 </div>
-            </div>
+            </a>
             @endforeach
         </div>
         <div class="trending-footer">
-            <a href="#" class="btn btn-outline" style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);color:#9397a8;font-size:14px;font-weight:600;transition:all 0.2s;font-family:'Inter',sans-serif;">
+            <a href="{{ route('frontend.assets.index') }}" class="btn btn-outline" style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);color:#9397a8;font-size:14px;font-weight:600;transition:all 0.2s;font-family:'Inter',sans-serif;">
                 View All Assets <i class="fa-solid fa-arrow-right"></i>
             </a>
         </div>
