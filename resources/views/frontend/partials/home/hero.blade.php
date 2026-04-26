@@ -137,7 +137,7 @@
             <div>
                 <div class="hero-badge">
                     <div class="dot"></div>
-                    Over 15 Million Premium Assets
+                    Over {{ number_format($totalAssets ?? 0) }} Premium Assets
                 </div>
                 <h1 class="hero-title">
                     Discover &amp; License<br>
@@ -181,7 +181,7 @@
                             <img src="https://randomuser.me/api/portraits/men/55.jpg" alt="user">
                         </div>
                         <div class="hero-trust-text">
-                            <strong>48,000+</strong> happy creators<br>
+                            <strong>{{ number_format($totalCreators ?? 0) }}+</strong> happy creators<br>
                             <span class="hero-stars">★★★★★ 4.9/5</span>
                         </div>
                     </div>

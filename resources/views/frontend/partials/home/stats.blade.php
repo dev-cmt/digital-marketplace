@@ -18,28 +18,28 @@
 <div class="stats-bar">
     <div class="stats-inner">
         <div class="stat-item reveal">
-            <div class="stat-num"><span>15M+</span></div>
+            <div class="stat-num"><span>{{ number_format($totalAssets ?? 0) }}</span></div>
             <div class="stat-label">Premium Assets</div>
         </div>
         <div class="stat-divider"></div>
         <div class="stat-item reveal">
-            <div class="stat-num"><span>48K+</span></div>
+            <div class="stat-num"><span>{{ number_format($totalCreators ?? 0) }}</span></div>
             <div class="stat-label">Active Creators</div>
         </div>
         <div class="stat-divider"></div>
         <div class="stat-item reveal">
-            <div class="stat-num"><span>2.1M+</span></div>
-            <div class="stat-label">Downloads Monthly</div>
+            <div class="stat-num"><span>{{ number_format($totalDownloads ?? 0) }}</span></div>
+            <div class="stat-label">Downloads</div>
         </div>
         <div class="stat-divider"></div>
         <div class="stat-item reveal">
-            <div class="stat-num"><span>$12M</span></div>
-            <div class="stat-label">Paid to Creators</div>
+            <div class="stat-num"><span>99%</span></div>
+            <div class="stat-label">Customer Satisfaction</div>
         </div>
         <div class="stat-divider"></div>
         <div class="stat-item reveal">
-            <div class="stat-num"><span>180+</span></div>
-            <div class="stat-label">Countries Served</div>
+            <div class="stat-num"><span>24/7</span></div>
+            <div class="stat-label">Support</div>
         </div>
     </div>
 </div>

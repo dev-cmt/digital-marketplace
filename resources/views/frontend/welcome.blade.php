@@ -15,10 +15,7 @@
     @include('frontend.partials.home.categories')
     @include('frontend.partials.home.trending')
     @include('frontend.partials.home.how-it-works')
-    @include('frontend.partials.home.plans')
     @include('frontend.partials.home.creators')
-    @include('frontend.partials.home.licensing')
-    @include('frontend.partials.home.testimonials')
     @include('frontend.partials.home.cta')
 </div>
 

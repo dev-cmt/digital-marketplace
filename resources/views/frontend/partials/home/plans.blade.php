@@ -69,58 +69,38 @@ input:checked + .toggle-slider:before { transform: translateX(24px); }
             <span>Annual <span class="save-badge">Save 35%</span></span>
         </div>
         <div class="plans-grid">
-            <!-- Free -->
-            <div class="plan-card reveal">
-                <div class="plan-name">Free</div>
-                <div class="plan-desc">Great for exploring. Browse and download limited free assets every month.</div>
-                <div class="plan-price-wrap">
-                    <div class="plan-price"><sup>$</sup>0<sub>/mo</sub></div>
+            @if(isset($pricingPlans) && $pricingPlans->count() > 0)
+                @foreach($pricingPlans as $index => $plan)
+                <div class="plan-card {{ $plan->is_popular ? 'popular' : '' }} reveal" style="animation-delay:{{ $index * 0.1 }}s;">
+                    @if($plan->is_popular)
+                    <div class="plan-popular-tag"><i class="fa-solid fa-bolt"></i> Most Popular</div>
+                    @endif
+                    <div class="plan-name">{{ $plan->name }}</div>
+                    <div class="plan-desc">{{ $plan->description }}</div>
+                    <div class="plan-price-wrap">
+                        <div class="plan-price" data-monthly="{{ $plan->monthly_price }}" data-annual="{{ $plan->annual_price }}">
+                            <sup>$</sup><span class="price-val">{{ $plan->monthly_price }}</span><sub>/mo</sub>
+                        </div>
+                    </div>
+                    <ul class="plan-features">
+                        @if($plan->features && is_array($plan->features))
+                            @foreach($plan->features as $feature)
+                                <li><i class="fa-solid fa-check"></i> {{ $feature }}</li>
+                            @endforeach
+                        @endif
+                    </ul>
+                    @if($plan->is_popular)
+                    <button class="plan-btn plan-btn-primary">Get Started</button>
+                    @else
+                    <button class="plan-btn plan-btn-outline">Get Started</button>
+                    @endif
                 </div>
-                <ul class="plan-features">
-                    <li><i class="fa-solid fa-check"></i> 10 free downloads/month</li>
-                    <li><i class="fa-solid fa-check"></i> Standard resolution only</li>
-                    <li><i class="fa-solid fa-check"></i> Personal license</li>
-                    <li class="na"><i class="fa-solid fa-xmark"></i> No HD or 4K downloads</li>
-                    <li class="na"><i class="fa-solid fa-xmark"></i> No commercial license</li>
-                    <li class="na"><i class="fa-solid fa-xmark"></i> No video downloads</li>
-                </ul>
-                <button class="plan-btn plan-btn-outline">Get Started Free</button>
-            </div>
-            <!-- Pro – Popular -->
-            <div class="plan-card popular reveal" style="animation-delay:0.1s;">
-                <div class="plan-popular-tag"><i class="fa-solid fa-bolt"></i> Most Popular</div>
-                <div class="plan-name">Pro</div>
-                <div class="plan-desc">Perfect for freelancers and studios who need premium assets regularly.</div>
-                <div class="plan-price-wrap">
-                    <div class="plan-price" data-monthly="29" data-annual="19"><sup>$</sup><span class="price-val">29</span><sub>/mo</sub></div>
+                @endforeach
+            @else
+                <div class="col-12 text-center text-muted w-100 grid-column-full">
+                    No pricing plans available yet.
                 </div>
-                <ul class="plan-features">
-                    <li><i class="fa-solid fa-check"></i> Unlimited photo downloads</li>
-                    <li><i class="fa-solid fa-check"></i> 100 video downloads/month</li>
-                    <li><i class="fa-solid fa-check"></i> Full HD &amp; 4K quality</li>
-                    <li><i class="fa-solid fa-check"></i> Commercial license included</li>
-                    <li><i class="fa-solid fa-check"></i> Priority support</li>
-                    <li class="na"><i class="fa-solid fa-xmark"></i> Extended license</li>
-                </ul>
-                <button class="plan-btn plan-btn-primary">Start Pro – 7 Days Free</button>
-            </div>
-            <!-- Enterprise -->
-            <div class="plan-card reveal" style="animation-delay:0.2s;">
-                <div class="plan-name">Enterprise</div>
-                <div class="plan-desc">For teams &amp; agencies with high-volume needs and custom licensing.</div>
-                <div class="plan-price-wrap">
-                    <div class="plan-price" data-monthly="99" data-annual="69"><sup>$</sup><span class="price-val">99</span><sub>/mo</sub></div>
-                </div>
-                <ul class="plan-features">
-                    <li><i class="fa-solid fa-check"></i> Unlimited everything</li>
-                    <li><i class="fa-solid fa-check"></i> Extended commercial license</li>
-                    <li><i class="fa-solid fa-check"></i> Multi-seat (up to 10 users)</li>
-                    <li><i class="fa-solid fa-check"></i> White-label rights</li>
-                    <li><i class="fa-solid fa-check"></i> API access</li>
-                    <li><i class="fa-solid fa-check"></i> Dedicated account manager</li>
-                </ul>
-                <button class="plan-btn plan-btn-outline">Contact Sales</button>
-            </div>
+            @endif
         </div>
         <p style="text-align:center;margin-top:24px;font-size:13px;color:#4a5060;">All plans include a 30-day money-back guarantee. No hidden fees.</p>
     </div>

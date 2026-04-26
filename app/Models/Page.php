@@ -11,6 +11,10 @@ class Page extends Model
         'title', 'slug', 'content'
     ];
 
+    protected $casts = [
+        'content' => 'array',
+    ];
+
     public function seo(): MorphOne
     {
         return $this->morphOne(Seo::class, 'seoable');

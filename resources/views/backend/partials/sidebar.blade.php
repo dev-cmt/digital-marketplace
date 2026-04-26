@@ -65,6 +65,16 @@
                 </li>
                 @endcan
 
+                <!-- Page Content -->
+                @can('view settings')
+                <li class="slide">
+                    <a href="{{ route('settings.pages-content.index') }}" class="side-menu__item {{ Request::is('pages-content*') ? 'active' : '' }}">
+                        <i class="bx bx-book-content side-menu__icon"></i>
+                        <span class="side-menu__label">Page Content</span>
+                    </a>
+                </li>
+                @endcan
+
 
                 <!-- Authentication - Only for admin -->
                 @canany(['view roles', 'view users'])
@@ -129,6 +139,12 @@
 
                 <!-- Settings -->
                 @can('view settings')
+                <li class="slide">
+                    <a href="{{ route('pricing_plans.index') }}" class="side-menu__item {{ Request::is('pricing-plans*') ? 'active' : '' }}">
+                        <i class="bx bx-dollar-circle side-menu__icon"></i>
+                        <span class="side-menu__label">Pricing Plans</span>
+                    </a>
+                </li>
                 <li class="slide">
                     <a href="{{ route('setting.index') }}" class="side-menu__item {{ Request::is('setting*') ? 'active' : '' }}">
                         <i class="bx bxs-cog side-menu__icon"></i>

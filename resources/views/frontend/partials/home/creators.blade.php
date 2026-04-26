@@ -46,7 +46,7 @@
         <div class="creators-grid">
             @foreach($topCreators as $c)
             <div class="creator-card reveal">
-                <div class="creator-earnings">${{ number_format(($c->assets_sum_downloads_count ?? 0) * 8.5) }} earned</div>
+                <div class="creator-earnings">{{ number_format($c->assets_sum_downloads_count ?? 0) }} Sales</div>
                 <div class="creator-avatar-wrap">
                     @if($c->photo_path)
                         <img class="creator-avatar" src="{{ asset($c->photo_path) }}" alt="{{ $c->name }}">

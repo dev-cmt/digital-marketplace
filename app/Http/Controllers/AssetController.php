@@ -172,11 +172,28 @@ class AssetController extends Controller
 
         // Handle External URLs
         if (filter_var($filePath, FILTER_VALIDATE_URL)) {
-            return redirect()->to($filePath);
+            $fileName = Str::slug($asset->title) . '.jpg'; // Fallback extension
+            $pathInfo = pathinfo(parse_url($filePath, PHP_URL_PATH), PATHINFO_EXTENSION);
+            if ($pathInfo) {
+                $fileName = Str::slug($asset->title) . '.' . $pathInfo;
+            }
+
+            return response()->streamDownload(function () use ($filePath) {
+                if ($stream = fopen($filePath, 'r')) {
+                    while (!feof($stream)) {
+                        echo fread($stream, 1024 * 8);
+                        ob_flush();
+                        flush();
+                    }
+                    fclose($stream);
+                }
+            }, $fileName);
         }
 
         // Handle Local Files
+        $filePath = ltrim($filePath, '/');
         $fullPath = public_path($filePath);
+        
         if (file_exists($fullPath)) {
             $extension = pathinfo($fullPath, PATHINFO_EXTENSION);
             $fileName = Str::slug($asset->title) . '.' . $extension;

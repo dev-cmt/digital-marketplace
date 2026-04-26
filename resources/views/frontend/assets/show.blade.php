@@ -137,8 +137,7 @@
                     @if($asset->is_free)
                     <a href="{{ route('frontend.assets.download', $asset->slug) }}" 
                        class="btn btn-primary" 
-                       style="width:100%; justify-content:center; padding: 18px; font-size:16px;"
-                       onclick="handleDownloadClick(event, '{{ $asset->slug }}', '{{ route('frontend.assets.download', $asset->slug) }}')">
+                       style="width:100%; justify-content:center; padding: 18px; font-size:16px;">
                         <i class="fa-solid fa-download"></i> Download Now
                     </a>
                     @else

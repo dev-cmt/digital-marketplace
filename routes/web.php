@@ -106,6 +106,13 @@ Route::middleware('auth')->group(function () {
     // SEO settings
     Route::get('/seo-pages',[PageSeoController::class,'index'])->name('settings.seo.index');
     Route::post('/seo-pages/{page}',[PageSeoController::class,'update'])->name('settings.seo.update');
+    
+    // Page Content settings
+    Route::get('/pages-content', [\App\Http\Controllers\PageContentController::class, 'index'])->name('settings.pages-content.index');
+    Route::post('/pages-content', [\App\Http\Controllers\PageContentController::class, 'update'])->name('settings.pages-content.update');
+
+    // Pricing Plans
+    Route::resource('/pricing-plans', PricingPlanController::class)->names('pricing_plans');
 });
 
 require __DIR__.'/auth.php';

@@ -49,7 +49,7 @@
             <a href="{{ route('frontend.assets.category', $category->slug) }}" class="cat-card c{{ ($index % 6) + 1 }} reveal">
                 <div class="cat-icon ic{{ ($index % 6) + 1 }}"><i class="{{ $category->icon }}"></i></div>
                 <div class="cat-name">{{ $category->name }}</div>
-                <div class="cat-count">{{ number_format($category->assets_count ?? rand(1000, 50000)) }} assets</div>
+                <div class="cat-count">{{ number_format($category->assets_count ?? 0) }} assets</div>
             </a>
             @endforeach
         </div>

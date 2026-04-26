@@ -80,7 +80,7 @@
         </div>
         <div class="media-grid">
             @foreach($trendingAssets as $item)
-            <a href="{{ route('frontend.assets.show', $item->slug) }}" class="media-card reveal">
+            <a href="{{ route('frontend.assets.show', $item->slug) }}" class="media-card reveal" data-category="{{ strtolower($item->category->name ?? '') }}" data-free="{{ $item->is_free ? 'true' : 'false' }}">
                 <div class="media-thumb">
                     <img src="{{ $item->thumbnail }}" alt="{{ $item->title }}" loading="lazy">
                     <div class="media-overlay"></div>
@@ -127,6 +127,19 @@ document.querySelectorAll('.trending-tab').forEach(function(btn){
     btn.addEventListener('click', function(){
         document.querySelectorAll('.trending-tab').forEach(function(b){ b.classList.remove('active'); });
         this.classList.add('active');
+        
+        let filterType = this.getAttribute('data-type');
+        let cards = document.querySelectorAll('.media-grid .media-card');
+        
+        cards.forEach(function(card){
+            if (filterType === 'all') {
+                card.style.display = 'block';
+            } else if (filterType === 'free') {
+                card.style.display = (card.getAttribute('data-free') === 'true') ? 'block' : 'none';
+            } else {
+                card.style.display = (card.getAttribute('data-category') === filterType) ? 'block' : 'none';
+            }
+        });
     });
 });
 </script>

@@ -30,7 +30,7 @@ class HomeController extends Controller
             ['name' => 'Home', 'url' => url('/')],
         ]);
 
-        $categories = \App\Models\Category::where('is_active', true)->orderBy('order')->get();
+        $categories = \App\Models\Category::where('is_active', true)->withCount('assets')->orderBy('order')->get();
         $trendingAssets = \App\Models\Asset::with('category')->active()->trending()->take(8)->get();
         $featuredAssets = \App\Models\Asset::with('category')->active()->take(4)->get(); // For hero visual or elsewhere
 
@@ -41,8 +41,13 @@ class HomeController extends Controller
             ->orderByDesc('assets_count')
             ->take(4)
             ->get();
+            
+        // Stats for the home page
+        $totalAssets = \App\Models\Asset::count();
+        $totalCreators = \App\Models\User::has('assets')->count();
+        $totalDownloads = \App\Models\Asset::sum('downloads_count');
 
-        return view('frontend.welcome', compact('seotags', 'breadcrumbs', 'categories', 'trendingAssets', 'featuredAssets', 'topCreators'));
+        return view('frontend.welcome', compact('seotags', 'breadcrumbs', 'categories', 'trendingAssets', 'featuredAssets', 'topCreators', 'totalAssets', 'totalCreators', 'totalDownloads'));
     }
 
     public function assetsIndex(Request $request, $category_slug = null)
@@ -157,7 +162,8 @@ class HomeController extends Controller
 
     public function pricing()
     {
-        return view('frontend.pricing');
+        $pricingPlans = \App\Models\PricingPlan::active()->orderBy('order')->get();
+        return view('frontend.pricing', compact('pricingPlans'));
     }
 
     public function creators()
